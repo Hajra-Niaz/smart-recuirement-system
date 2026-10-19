@@ -1,0 +1,74 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border: none;
+}
+
+.analysis-result {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px 0;
+}
+
+.score-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 10px;
+    color: white;
+    margin: 10px 0;
+}
+
+.score-excellent { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+.score-good { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.score-average { background: linear-gradient(135deg, #f46b45 0%, #eea849 100%); }
+.score-poor { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); }
+
+.progress {
+    height: 25px;
+    margin: 10px 0;
+}
+
+.progress-bar {
+    font-weight: bold;
+}
+
+.qa-pair {
+    border-left: 4px solid #667eea;
+    padding-left: 15px;
+    margin: 15px 0;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.loading-spinner {
+    display: none;
+    text-align: center;
+    padding: 20px;
+}

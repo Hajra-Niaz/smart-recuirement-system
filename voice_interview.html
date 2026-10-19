@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-microphone me-2"></i>Voice Interview Analysis</h3>
+            </div>
+            <div class="card-body">
+                <form id="voiceInterviewForm" enctype="multipart/form-data">
+                    <div class="mb-4">
+                        <h5>Upload Audio Recordings</h5>
+                        <p class="text-muted">Upload audio files (MP3, WAV, M4A) for each interview question</p>
+                        
+                        <div id="audioUploads">
+                            <div class="audio-upload-item border p-3 mb-3 rounded">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Question:</label>
+                                        <input type="text" class="form-control question-input" 
+                                               placeholder="Enter the interview question" required>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label">Audio File:</label>
+                                        <input type="file" class="form-control audio-input" 
+                                               accept="audio/*" required>
+                                    </div>
+                                    <div class="col-md-1 d-flex align-items-end">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                onclick="removeAudioItem(this)">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-primary" onclick="addAudioItem()">
+                            <i class="fas fa-plus"></i> Add Another Question
+                        </button>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> Each audio file should contain the candidate's answer to the corresponding question.
+                        Supported formats: MP3, WAV, M4A (max 10MB per file)
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg" id="analyzeBtn">
+                        <i class="fas fa-robot"></i> Analyze Voice Interview
+                    </button>
+                    
+                    <div id="loadingIndicator" class="mt-3 d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="ms-2">Processing audio and analyzing with AI...</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let audioItemCount = 1;
+
+function addAudioItem() {
+    audioItemCount++;
+    const container = document.getElementById('audioUploads');
+    
+    const newItem = document.createElement('div');
+    newItem.className = 'audio-upload-item border p-3 mb-3 rounded';
+    newItem.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <label class="form-label">Question:</label>
+                <input type="text" class="form-control question-input" 
+                       placeholder="Enter the interview question" required>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Audio File:</label>
+                <input type="file" class="form-control audio-input" 
+                       accept="audio/*" required>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="button" class="btn btn-sm btn-outline-danger" 
+                        onclick="removeAudioItem(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(newItem);
+}
+
+function removeAudioItem(button) {
+    if (audioItemCount > 1) {
+        button.closest('.audio-upload-item').remove();
+        audioItemCount--;
+    }
+}
+
+// Form submission
+document.getElementById('voiceInterviewForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData();
+    const questions = [];
+    const audioFiles = document.querySelectorAll('.audio-input');
+    const questionInputs = document.querySelectorAll('.question-input');
+    
+    // Validate
+    let valid = true;
+    questionInputs.forEach((input, index) => {
+        if (!input.value.trim() || !audioFiles[index].files[0]) {
+            valid = false;
+        }
+        questions.push(input.value.trim());
+    });
+    
+    if (!valid) {
+        alert('Please fill all questions and upload all audio files.');
+        return;
+    }
+    
+    // Add questions and files to form data
+    questions.forEach((question, index) => {
+        formData.append('questions[]', question);
+        formData.append('audio_files', audioFiles[index].files[0]);
+    });
+    
+    // Show loading
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    
+    analyzeBtn.disabled = true;
+    analyzeBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+    loadingIndicator.classList.remove('d-none');
+    
+    try {
+        const response = await fetch('/analyze-voice-interview', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            alert('✅ ' + result.message);
+            window.location.href = result.redirect || '/results';
+        } else {
+            alert('❌ ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Error: ' + error.message);
+    } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtn.innerHTML = '<i class="fas fa-robot"></i> Analyze Voice Interview';
+        loadingIndicator.classList.add('d-none');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-keyboard me-2"></i>Manual Interview Analysis</h3>
+            </div>
+            <div class="card-body">
+                <form id="manualInterviewForm">
+                    <div class="mb-4">
+                        <h5>Interview Questions & Answers</h5>
+                        <p class="text-muted">Add each interview question and the candidate's response</p>
+                        
+                        <div id="qaContainer">
+                            <!-- Q&A pairs will be added here dynamically -->
+                        </div>
+                        
+                        <button type="button" class="btn btn-outline-primary" onclick="addQAPair()">
+                            <i class="fas fa-plus"></i> Add Question & Answer
+                        </button>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-lg" id="analyzeBtn">
+                        <i class="fas fa-robot"></i> Analyze Interview
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let qaCount = 0;
+
+function addQAPair() {
+    qaCount++;
+    const qaContainer = document.getElementById('qaContainer');
+    if (!qaContainer) return;
+    
+    const qaDiv = document.createElement('div');
+    qaDiv.className = 'qa-pair border p-3 mb-3 rounded';
+    qaDiv.innerHTML = `
+        <h6>Question ${qaCount}</h6>
+        <div class="mb-2">
+            <label class="form-label">Question:</label>
+            <input type="text" class="form-control question-input" required 
+                   placeholder="Enter the interview question">
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Candidate's Answer:</label>
+            <textarea class="form-control answer-input" rows="3" required 
+                      placeholder="Enter the candidate's response"></textarea>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeQAPair(this)">
+            <i class="fas fa-trash"></i> Remove
+        </button>
+    `;
+    qaContainer.appendChild(qaDiv);
+}
+
+function removeQAPair(button) {
+    if (button && button.parentNode) {
+        button.parentNode.remove();
+        updateQACount();
+    }
+}
+
+function updateQACount() {
+    const pairs = document.querySelectorAll('.qa-pair');
+    pairs.forEach((pair, index) => {
+        const header = pair.querySelector('h6');
+        if (header) {
+            header.textContent = `Question ${index + 1}`;
+        }
+    });
+    qaCount = pairs.length;
+}
+
+function showAlert(message, type = 'info') {
+    // Remove existing alerts
+    const existingAlerts = document.querySelectorAll('.custom-alert');
+    existingAlerts.forEach(alert => alert.remove());
+    
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show mt-3 custom-alert`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const cardBody = document.querySelector('.card-body');
+    if (cardBody) {
+        cardBody.insertBefore(alertDiv, cardBody.firstChild);
+    }
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🚀 Manual interview page loaded");
+    
+    // Add initial question pair
+    addQAPair();
+    
+    const form = document.getElementById('manualInterviewForm');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    
+    if (form && analyzeBtn) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log("📤 Form submission started");
+            
+            // Collect all questions and answers
+            const questionInputs = document.querySelectorAll('.question-input');
+            const answerInputs = document.querySelectorAll('.answer-input');
+            
+            console.log(`📝 Found ${questionInputs.length} questions`);
+            
+            if (questionInputs.length === 0) {
+                showAlert('❌ Please add at least one question and answer pair.', 'warning');
+                return;
+            }
+            
+            const qaPairs = [];
+            let hasEmptyFields = false;
+            
+            for (let i = 0; i < questionInputs.length; i++) {
+                const question = questionInputs[i].value.trim();
+                const answer = answerInputs[i].value.trim();
+                
+                if (!question || !answer) {
+                    hasEmptyFields = true;
+                    continue;
+                }
+                
+                qaPairs.push({
+                    question: question,
+                    answer: answer
+                });
+            }
+            
+            if (hasEmptyFields) {
+                showAlert('⚠️ Please fill in all questions and answers.', 'warning');
+                return;
+            }
+            
+            if (qaPairs.length === 0) {
+                showAlert('❌ Please add valid questions and answers.', 'warning');
+                return;
+            }
+            
+            console.log("📨 Submitting Q&A pairs:", qaPairs);
+            
+            // Show loading state
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Analyzing...';
+            
+            try {
+                const response = await fetch('/analyze-manual-interview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        questions_answers: qaPairs 
+                    })
+                });
+                
+                const result = await response.json();
+                console.log("📬 Server response:", result);
+                
+                if (response.ok) {
+                    showAlert('✅ ' + result.message, 'success');
+                    
+                    // Redirect to results page
+                    setTimeout(() => {
+                        window.location.href = result.redirect || '/results';
+                    }, 1500);
+                } else {
+                    showAlert('❌ ' + result.error, 'danger');
+                }
+            } catch (error) {
+                console.error('💥 Network error:', error);
+                showAlert('❌ Network error: ' + error.message, 'danger');
+            } finally {
+                // Reset button state
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = 'Analyze Interview';
+            }
+        });
+    } else {
+        console.error("❌ Form or button not found");
+    }
+});
+</script>
+{% endblock %}

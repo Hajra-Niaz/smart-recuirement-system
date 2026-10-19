@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center mb-5">
+        <h1 class="display-4">Smart Recruitment System</h1>
+        <p class="lead">AI-powered resume analysis and interview evaluation</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                <h3>Resume Reader</h3>
+                <p>Upload resumes and analyze them against job requirements</p>
+                <a href="{{ url_for('resume_reader') }}" class="btn btn-primary">Analyze Resume</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <i class="fas fa-comments fa-3x text-success mb-3"></i>
+                <h3>Interview Analyzer</h3>
+                <p>Evaluate interviews through text input or voice recordings</p>
+                <a href="{{ url_for('interview_analyzer') }}" class="btn btn-success">Analyze Interview</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4>How It Works</h4>
+                <ol>
+                    <li><strong>Resume Analysis:</strong> Upload candidate resumes and get analysis</li>
+                    <li><strong>Interview Evaluation:</strong> Conduct and analyze interviews</li>
+                    <li><strong>Combined Scoring:</strong> Get comprehensive candidate evaluation</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

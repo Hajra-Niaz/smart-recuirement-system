@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="fas fa-comments me-2"></i>Interview Analyzer</h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">Choose your interview analysis method:</p>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-keyboard fa-3x text-primary mb-3"></i>
+                                <h4>Manual Interview</h4>
+                                <p>Enter questions and answers as text</p>
+                                <a href="{{ url_for('manual_interview') }}" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Start Manual Analysis
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body text-center">
+                                <i class="fas fa-microphone fa-3x text-success mb-3"></i>
+                                <h4>Voice Interview</h4>
+                                <p>Upload audio recordings of interview</p>
+                                <a href="{{ url_for('voice_interview') }}" class="btn btn-success">
+                                    <i class="fas fa-upload"></i> Start Voice Analysis
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h5>How it works:</h5>
+                    <ul>
+                        <li><strong>Manual:</strong> Type questions and candidate responses</li>
+                        <li><strong>Voice:</strong> Upload audio files for automatic transcription</li>
+                        <li><strong>AI Analysis:</strong> Get detailed evaluation of communication, technical skills, and cultural fit</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

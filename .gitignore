@@ -1,0 +1,20 @@
+# Environment variables (API Keys)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Uploaded files (don't save user resumes/audio to GitHub)
+static/uploads/
+
+# Virtual environments
+venv/
+env/
+
+# OS files
+.DS_Store
+Thumbs.db

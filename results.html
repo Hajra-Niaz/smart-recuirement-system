@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h3 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Candidate Analysis Results</h3>
+            </div>
+            <div class="card-body">
+                <!-- Final Score Card -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="score-card 
+                            {% if final_result.final_score >= 85 %}score-excellent
+                            {% elif final_result.final_score >= 75 %}score-good
+                            {% elif final_result.final_score >= 65 %}score-average
+                            {% else %}score-poor{% endif %}">
+                            <h4>Final Score</h4>
+                            <h1>{{ final_result.final_score }}/100</h1>
+                            <h5>{{ final_result.recommendation }}</h5>
+                            {% if final_result.grade %}
+                            <p>Grade: {{ final_result.grade }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="score-card score-good">
+                            <h4>Resume Score</h4>
+                            <h1>{{ final_result.resume_score }}/100</h1>
+                            <p>Based on skills & experience</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="score-card score-good">
+                            <h4>Interview Score</h4>
+                            <h1>{{ final_result.interview_score }}/100</h1>
+                            <p>Based on communication & knowledge</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Resume Analysis Results -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>Resume Analysis</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if resume_analysis and resume_analysis.analysis %}
+                                    {% if resume_analysis.analysis.skills_match %}
+                                    <h6>Skills Match: {{ resume_analysis.analysis.skills_match.match_percentage }}%</h6>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar" style="width: {{ resume_analysis.analysis.skills_match.match_percentage }}%">
+                                            {{ resume_analysis.analysis.skills_match.match_percentage }}%
+                                        </div>
+                                    </div>
+                                    
+                                    <h6>Matched Skills:</h6>
+                                    <div class="mb-3">
+                                        {% for skill in resume_analysis.analysis.skills_match.matched_skills %}
+                                        <span class="badge bg-success me-1 mb-1">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <h6>Missing Skills:</h6>
+                                    <div class="mb-3">
+                                        {% for skill in resume_analysis.analysis.skills_match.missing_skills %}
+                                        <span class="badge bg-warning me-1 mb-1">{{ skill }}</span>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if resume_analysis.analysis.experience_analysis %}
+                                    <h6>Experience Level: {{ resume_analysis.analysis.experience_analysis.experience_level }}</h6>
+                                    {% endif %}
+                                    
+                                    {% if resume_analysis.analysis.strengths %}
+                                    <p><strong>Strengths:</strong></p>
+                                    <ul>
+                                        {% for strength in resume_analysis.analysis.strengths %}
+                                        <li>{{ strength }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-muted">No resume analysis data available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interview Analysis Results -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fas fa-comments me-2"></i>Interview Analysis</h5>
+                            </div>
+                            <div class="card-body">
+                                {% if interview_analysis and interview_analysis.analysis %}
+                                    {% if interview_analysis.analysis.communication_skills %}
+                                    <h6>Communication: {{ interview_analysis.analysis.communication_skills.overall_score }}/100</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" style="width: {{ interview_analysis.analysis.communication_skills.overall_score }}%"></div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if interview_analysis.analysis.technical_knowledge %}
+                                    <h6>Technical Knowledge: {{ interview_analysis.analysis.technical_knowledge.overall_score }}/100</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-info" style="width: {{ interview_analysis.analysis.technical_knowledge.overall_score }}%"></div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if interview_analysis.analysis.problem_solving %}
+                                    <h6>Problem Solving: {{ interview_analysis.analysis.problem_solving.overall_score }}/100</h6>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-warning" style="width: {{ interview_analysis.analysis.problem_solving.overall_score }}%"></div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if interview_analysis.analysis.cultural_fit %}
+                                    <h6>Cultural Fit: {{ interview_analysis.analysis.cultural_fit.overall_score }}/100</h6>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar bg-primary" style="width: {{ interview_analysis.analysis.cultural_fit.overall_score }}%"></div>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if interview_analysis.analysis.strengths %}
+                                    <p><strong>Interview Strengths:</strong></p>
+                                    <ul>
+                                        {% for strength in interview_analysis.analysis.strengths %}
+                                        <li>{{ strength }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-muted">No interview analysis data available.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Recommendations -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header bg-warning text-dark">
+                                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>AI Recommendations</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Resume Recommendations:</h6>
+                                        {% if resume_analysis and resume_analysis.analysis and resume_analysis.analysis.recommendations %}
+                                        <ul>
+                                            {% for rec in resume_analysis.analysis.recommendations %}
+                                            <li>{{ rec }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% else %}
+                                        <p class="text-muted">No resume recommendations available.</p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Interview Recommendations:</h6>
+                                        {% if interview_analysis and interview_analysis.analysis and interview_analysis.analysis.recommendations %}
+                                        <ul>
+                                            {% for rec in interview_analysis.analysis.recommendations %}
+                                            <li>{{ rec }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% else %}
+                                        <p class="text-muted">No interview recommendations available.</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="row mt-4">
+                    <div class="col-md-12 text-center">
+                        <a href="{{ url_for('resume_reader') }}" class="btn btn-primary me-2">
+                            <i class="fas fa-redo"></i> Analyze Another Resume
+                        </a>
+                        <a href="{{ url_for('interview_analyzer') }}" class="btn btn-success me-2">
+                            <i class="fas fa-redo"></i> Conduct Another Interview
+                        </a>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Simple script to handle any dynamic behavior
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Results page loaded successfully');
+    
+    // You can add PDF download functionality here later
+    const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    if (downloadPdfBtn) {
+        downloadPdfBtn.addEventListener('click', function() {
+            alert('PDF download feature will be available soon!');
+        });
+    }
+});
+</script>
+{% endblock %}
